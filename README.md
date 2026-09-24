@@ -1,28 +1,86 @@
 # Omac
 
-A keyboard-driven tiling window manager for macOS. It brings
-[Omarchy](https://omarchy.org)'s window keys to the Mac: windows tile
-themselves, never overlap, and move with the keyboard.
-
-This repository holds the **downloads**. The source code is private.
+A tiling window manager for macOS. Your windows arrange themselves side by
+side, never overlap, and you move between them with the keyboard. It brings
+[Omarchy](https://omarchy.org)'s window keys to the Mac.
 
 ## Install
 
-Paste this into **Terminal** (Applications → Utilities → Terminal):
+**Needs** a Mac with Apple silicon and macOS 14 or later. Nothing else — no
+Homebrew, no developer tools, no GitHub account.
+
+**1. Paste this into Terminal** (⌘ Space, type *Terminal*, press Return):
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/evanscastonguay/omac/main/install.sh | bash
 ```
 
-Omac then starts and macOS asks you to let it control your windows. Click
-**Open System Settings** and turn **Omac** on under **Privacy & Security →
-Accessibility**. No hotkey works until you do.
+If an old copy of Omac is in `/Applications`, Terminal asks for your Mac
+password to remove it. Two copies conflict.
 
-Check it with `omac status` in a new Terminal window — `accessibility` and
-`tap` should both be `true`.
+**2. Let Omac control your windows.** A macOS dialog appears: click **Open
+System Settings**, then turn **Omac** on under **Privacy & Security →
+Accessibility**. Omac notices within two seconds — no restart needed.
 
-**Needs** a Mac with Apple silicon and macOS 14 or later. Nothing else — no
-Homebrew, no developer tools.
+**3. Check it.** Open a **new** Terminal window and run:
+
+```bash
+omac status
+```
+
+You should see:
+
+```
+accessibility        true
+tap                  true
+```
+
+Done. Omac also starts by itself when you log in.
+
+## Try it
+
+The Omac key is **Left ⌘**. Right ⌘ still works as a normal ⌘.
+
+| Press | What happens |
+|---|---|
+| Left ⌘ **K** | Shows every shortcut |
+| Left ⌘ **Return** | Opens a terminal |
+| Left ⌘ **← ↑ → ↓** | Moves between windows |
+| Left ⌘ **Shift ← ↑ → ↓** | Swaps a window with its neighbour |
+| Left ⌘ **1 … 0** | Switches to workspace 1–10 |
+| Left ⌘ **Shift 1 … 0** | Sends the window to that workspace |
+| Left ⌘ **Shift Space** | Lets a window float freely |
+
+**To stop it:** Left ⌘ **Ctrl ⌥ Esc** pauses the tiling; press it again to
+resume. `omac quit` quits Omac.
+
+## If something is wrong
+
+| You see | What to do |
+|---|---|
+| Left ⌘ shortcuts do nothing | Omac needs the Accessibility permission (step 2). `omac status` says `accessibility false` until it has it. |
+| `omac: command not found` | Open a **new** Terminal window. The installer set this up for new windows only. |
+| *"Apple could not verify Omac…"* | Omac was downloaded with a web browser. Use the Terminal command in step 1 instead. |
+| `Omac was not installed: …` | The message says why. Run the command again; if it happens again, send the full output. |
+
+**Reporting a problem:** send the output of `omac status` and what you pressed.
+
+## Update
+
+Run the install command from step 1 again. Your settings and the Accessibility
+permission are kept.
+
+## Uninstall
+
+```bash
+omac login off; omac quit
+rm -rf ~/Applications/Omac.app ~/.local/bin/omac
+```
+
+Then remove Omac from **System Settings → Privacy & Security → Accessibility**.
+Your settings stay in `~/.config/omac` and `~/.local/state/omac` — delete them to
+remove everything. The installer may also have added two lines, starting with
+`# Added by the Omac installer`, to `~/.zshrc`; you can delete them.
 
 <details>
 <summary><b>What the install command does</b></summary>
@@ -31,15 +89,14 @@ Homebrew, no developer tools.
 
 1. Downloads the latest release from this repository.
 2. Checks its SHA-256 checksum, so a broken download is never installed.
-3. Checks that the app is signed with Omac's Developer ID (team `5GB46V9555`),
-   so a modified app is never installed.
-4. Removes any old copy in `/Applications` — two copies conflict and stop every
-   hotkey. If that copy belongs to another user, macOS asks for your password.
+3. Checks the app is signed with Omac's Developer ID (team `5GB46V9555`), so a
+   modified app is never installed.
+4. Removes an old copy in `/Applications`, if there is one.
 5. Installs `Omac.app` to `~/Applications` and the `omac` command to
-   `~/.local/bin`, adding that folder to your `PATH` in your shell's startup file.
-6. Starts Omac and, on a first install, sets it to start when you log in.
+   `~/.local/bin`, adding that folder to your `PATH` if it is not already there.
+6. Starts Omac. On a first install it also turns on *start at login*.
 
-You can read the script before running it:
+To read the script before running it:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/evanscastonguay/omac/main/install.sh -o install.sh
@@ -56,48 +113,31 @@ bash install.sh
 
 1. Download **`Omac-arm64.zip`** from the
    [latest release](https://github.com/evanscastonguay/omac/releases/latest) and open it.
-2. Drag **`Omac.app`** from the folder that appears into your **Applications** folder.
-3. Open Omac. macOS says it *cannot verify* it — click **Done**, then open
-   **System Settings → Privacy & Security**, scroll down, and click
-   **Open Anyway** next to Omac.
+2. Drag **`Omac.app`** from the folder that appears into **Applications**.
+3. Open Omac. macOS says it *cannot verify* it — click **Done**, open **System
+   Settings → Privacy & Security**, scroll down and click **Open Anyway**.
+4. Continue with step 2 above.
 
-This way does not set up the `omac` command; run the Terminal command above
-later if you want it. It also does not start Omac at login — choose **Launch at login** from Omac's
-menu-bar icon for that.
-
-That extra step happens because Omac is signed but not notarized by Apple, and
-macOS checks files downloaded by a web browser. Files downloaded by the Terminal
-command above are not checked this way, so it has no such step.
+This way does not set up the `omac` command or start at login. Choose **Launch
+at login** from Omac's menu-bar icon for that.
 
 </details>
 
-## Update
+<details>
+<summary><b>Why "signed but not notarized"?</b></summary>
 
-Run the install command again. Your settings and your Accessibility permission
-are kept.
+<br>
 
-To install a specific version instead of the latest:
+Omac is signed with a Developer ID, so macOS knows who built it and that it has
+not been changed since — the installer checks that before installing. It is not
+*notarized*, a separate Apple scan that needs a paid Apple Developer
+membership. macOS only asks about that for files downloaded with a web browser,
+which is why the Terminal command has no extra step.
 
-```bash
-curl -fsSL https://raw.githubusercontent.com/evanscastonguay/omac/main/install.sh | bash -s -- v1.4.4
-```
+</details>
 
-## Uninstall
+---
 
-```bash
-omac login off; omac quit
-rm -rf ~/Applications/Omac.app ~/.local/bin/omac
-```
-
-Your settings stay in `~/.config/omac` and `~/.local/state/omac`; delete those
-too to remove everything. The installer also added one line marked
-`# Added by the Omac installer` to your shell's startup file (`~/.zshrc` by
-default), which you can delete. Remove Omac from **System Settings → Privacy &
-Security → Accessibility** as well.
-
-## Why "signed but not notarized"?
-
-Omac is signed with a Developer ID certificate, so macOS knows who built it and
-that it has not been changed since. It is not notarized — notarization is a
-separate scan by Apple that needs a paid Apple Developer membership. The
-installer checks the signature itself before installing.
+<sub>Tested with the exact command above on an Apple-silicon Mac running macOS
+26.3.1, on 2026-09-24: installed 1.4.4, signature verified, `accessibility true`,
+`tap true`.</sub>
