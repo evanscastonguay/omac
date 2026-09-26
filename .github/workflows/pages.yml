@@ -24,6 +24,11 @@ concurrency:
 
 jobs:
   deploy:
+    # The same file lives in the private source repo until the source moves
+    # here. There it must not run: a private repo has no free hosted minutes,
+    # so every push of this file failed (run 36267282232). Skipped, it costs
+    # nothing and reports nothing.
+    if: github.repository == 'evanscastonguay/omac'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
